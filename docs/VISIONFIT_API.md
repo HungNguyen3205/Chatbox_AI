@@ -9,7 +9,7 @@ Nguồn: `xuantruong5/VisionFit`, nhánh `develop`, `modules/backend/visionfit/r
 - `/api/ho-so` chưa đủ làm nguồn danh tính: controller nhận `id_nguoi_dung`, mặc định 1 và fallback user đầu tiên; một số giá trị gói tập đang cố định.
 - `ClientMiddleware` có cơ chế lấy client đầu tiên trong local nếu không xác thực được.
 
-Vì vậy **không dùng `/ho-so` hoặc fallback local để xác định user**. Bản trợ lý yêu cầu các endpoint chuyên biệt dưới đây và từ chối nếu thiếu/sai response.
+Vì vậy **không dùng `/ho-so` hoặc fallback local để xác định user**. Bản trợ lý dùng endpoint chuyên biệt trong `integrations/visionfit/`. Cài theo README của thư mục đó; hợp đồng dưới đây mô tả response và từ chối nếu sai danh tính.
 
 ## 1. Danh tính: GET /api/assistant/me
 
@@ -80,3 +80,7 @@ Endpoint cần trả JSON. Không redirect sang trang login. Logout chatbot hi�
 5. Revoke token khiến lần gọi tiếp theo trả 401.
 6. Không có secret/PII ngoài hợp đồng trong response hoặc log.
 7. Kiểm thử bằng tối thiểu hai hội viên khác nhau và hai phòng; test giả lập trong repo không thay thế kiểm thử backend thật.
+
+## Bộ triển khai đi kèm
+
+`npm run setup:visionfit -- "DUONG_DAN_BACKEND"` cài implementation theo schema thật. `packages` bổ sung `total_sessions` là số buổi mua, luôn tách với `remaining_sessions` chưa có ledger xác thực (null). `schedule` bổ sung `scheduled_date` để không bịa giờ khi `starts_at` thiếu. `progress.completion_percent` là trung bình các buổi trạng thái 2/3 từ đầu tuần đến hiện tại. `summary.expiring_members` đếm hội viên duy nhất có gói hết hạn trong 7 ngày. Admin cần map ID/phòng trong config vì schema hiện chưa có liên kết phòng cho admins.

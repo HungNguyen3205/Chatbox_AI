@@ -4,7 +4,7 @@
 
 Giao diện xanh rêu / xanh lime, linh vật VIF bằng CSS, khung chat responsive, đăng nhập theo vai trò và lịch sử riêng từng tài khoản. **Giao diện và server đều dùng JavaScript**, không cần PHP, Python, TypeScript hoặc tải toàn bộ VisionFit để chạy bản demo.
 
-> **Trạng thái:** bản nền chạy được bằng dữ liệu demo. Chưa kết nối server VisionFit thật và chưa kiểm thử với nhà cung cấp AI thật. Chế độ demo trả lời theo kịch bản, không phải mô hình AI. Không có dữ liệu khách hàng hoặc khóa bí mật trong repo.
+> **Trạng thái:** có bản demo và bộ tích hợp Laravel đọc database VisionFit qua API. Chưa kết nối server VisionFit thật và chưa kiểm thử với nhà cung cấp AI thật. Chế độ demo trả lời theo kịch bản, không phải mô hình AI. Không có dữ liệu khách hàng hoặc khóa bí mật trong repo.
 
 ## Chạy nhanh
 
@@ -42,13 +42,13 @@ Form tự điền khi đổi vai trò. Tài khoản demo **không phải** tài 
 
 Sao chép `.env.example` thành `.env` (Windows PowerShell: `Copy-Item .env.example .env`; macOS/Linux: `cp .env.example .env`).
 
-1. Đọc [hợp đồng API VisionFit](docs/VISIONFIT_API.md).
-2. Nhóm backend bổ sung hai endpoint được bảo vệ: `/assistant/me` và `/assistant/context`.
+1. Đọc [hướng dẫn cài bộ tích hợp](integrations/visionfit/README.md).
+2. Trong repo chatbot chạy `npm run setup:visionfit -- "DUONG_DAN_BACKEND_LARAVEL"`. Bộ tích hợp bổ sung `/assistant/me` và `/assistant/context` vào backend hiện có.
 3. Đặt `DATA_MODE=live` và `VISIONFIT_API_URL` là URL API backend, ví dụ `http://127.0.0.1:8000/api`.
 4. Dùng tài khoản VisionFit thật để đăng nhập. Bản nền đã ánh xạ các đường dẫn `/client/login`, `/trainer/login`, `/admin/login` và response `{status, token}` theo mã nguồn `develop` đã xem.
 5. Kiểm tra A/B khác tài khoản, khác phòng, hết hạn/revoke token, PT không được phân công. Không bật dữ liệu thật nếu backend chưa xác thực và giới hạn phạm vi.
 
-**Hai endpoint assistant là hợp đồng cần triển khai thêm, không khẳng định đã có trên VisionFit.** API `/ho-so` trong nhánh được khảo sát đang dùng ID mặc định/fallback; `ClientMiddleware` có bypass local. Chatbot không sử dụng các đường dẫn này. Xem chi tiết trong tài liệu tích hợp.
+**Hai endpoint assistant đã có mã cài đặt trong `integrations/visionfit/`, nhưng chỉ hoạt động sau khi cài vào backend VisionFit đang chạy.** API `/ho-so` trong nhánh được khảo sát đang dùng ID mặc định/fallback; `ClientMiddleware` có bypass local. Chatbot không sử dụng các đường dẫn này. Xem chi tiết trong tài liệu tích hợp.
 
 ## Bật mô hình AI
 
@@ -61,7 +61,7 @@ AI_API_KEY=your-server-side-key
 AI_MODEL=your-available-model-id
 ```
 
-Chọn model hỗ trợ Chat Completions và `max_completion_tokens`. Có thể thử AI thật với dữ liệu demo trước. Nếu đồng thời dùng `DATA_MODE=live`, cần phê duyệt việc gửi dữ liệu đã thu gọn sang nhà cung cấp AI và đặt:
+Chọn model hỗ trợ Chat Completions và `max_completion_tokens`. Có thể thử AI thật với dữ liệu demo trước. Khi dữ liệu thật bật nhưng AI_MODE=demo, trợ lý trả lời cơ bản theo từ khóa bằng dữ liệu API thật; không giả vờ đã dùng mô hình AI. Nếu đồng thời dùng `DATA_MODE=live`, cần phê duyệt việc gửi dữ liệu đã thu gọn sang nhà cung cấp AI và đặt:
 
 ```dotenv
 ALLOW_CUSTOMER_DATA_TO_AI=true
@@ -70,6 +70,10 @@ ALLOW_CUSTOMER_DATA_TO_AI=true
 Không gửi email, số điện thoại, thông tin thanh toán, mật khẩu hay token đến AI. Adapter chỉ nhận các trường trong `sanitizeContext()`. Câu hỏi và lịch sử do user nhập vẫn có thể chứa thông tin cá nhân; cần thông báo và thống nhất chính sách với đơn vị vận hành trước khi triển khai thật.
 
 Tài liệu nhà cung cấp: [OpenAI Chat Completions](https://developers.openai.com/api/reference/resources/chat). Không có khóa AI thì để `AI_MODE=demo`.
+
+## Lấy dữ liệu backend ngay trên máy anh
+
+Không cần tải toàn bộ VisionFit vào repo chatbot. Nếu đã có backend trên máy, xem [cài đặt trong vài bước](integrations/visionfit/README.md): chạy installer, khởi động backend và dùng `.env.visionfit.example`. Nếu backend nằm trên server, nhóm triển khai bộ tích hợp lên server rồi cấu hình URL API.
 
 ## Kiến trúc
 
@@ -96,6 +100,8 @@ server/
   visionfit.js        Adapter API, định danh, thu gọn dữ liệu
   assistant.js        Prompt, demo, gọi AI
   store.js            SQLite lưu lịch sử
+ integrations/visionfit/ API Laravel, middleware và test dùng schema thật
+ scripts/             Lệnh cài tích hợp vào backend hiện có
  tests/app.test.js     Kiểm thử tích hợp bằng upstream giả lập
  docs/                Hợp đồng API và hướng dẫn triển khai
 ```

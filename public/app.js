@@ -19,14 +19,14 @@ function showLogin(error = '') {
   $('message').value = ''; $('typing').hidden = true; $('login-error').textContent = error; $('chat-error').textContent = '';
   $('password').value = ''; $('clear-dialog').close(); updateBusy();
 }
-function modeLabel() { return state.dataMode === 'demo' ? '🧪 DỮ LIỆU DEMO' : state.aiMode === 'demo' ? 'API THẬT · AI DEMO' : 'ĐÃ KẾT NỐI'; }
+function modeLabel() { return state.dataMode === 'demo' ? '🧪 DỮ LIỆU DEMO' : state.aiMode === 'demo' ? 'API THẬT · CƠ BẢN' : 'ĐÃ KẾT NỐI'; }
 function fillDemo() {
   if (state.dataMode === 'demo') { $('email').value = `${$('role').value}@demo.visionfit.local`; $('password').value = 'Demo123!'; }
 }
 function updateMode() {
   $('login-mode').textContent = modeLabel(); $('app-mode').textContent = modeLabel();
   $('demo-info').hidden = state.dataMode !== 'demo';
-  $('mode-notice').textContent = state.dataMode === 'demo' ? 'Bạn đang dùng dữ liệu minh họa. Đây chưa phải thông tin hội viên thật.' : state.aiMode === 'demo' ? 'Dữ liệu từ VisionFit. Cấu hình AI để bật câu trả lời cá nhân hóa.' : 'Thông tin được tra cứu theo quyền tài khoản. Trợ lý hiện chỉ hỗ trợ đọc dữ liệu.';
+  $('mode-notice').textContent = state.dataMode === 'demo' ? 'Bạn đang dùng dữ liệu minh họa. Đây chưa phải thông tin hội viên thật.' : state.aiMode === 'demo' ? 'Đang đọc dữ liệu thật từ VisionFit. Trả lời cơ bản theo từ khóa; chưa bật mô hình AI.' : 'Thông tin được tra cứu theo quyền tài khoản. Trợ lý hiện chỉ hỗ trợ đọc dữ liệu.';
 }
 function renderMessages(messages) {
   $('messages').replaceChildren(); $('welcome').hidden = messages.length > 0;
@@ -47,9 +47,9 @@ function card(label, title, lines = []) {
 function renderContext(c) {
   $('context-content').replaceChildren();
   card('Mục tiêu hiện tại', c.profile.goal || 'Chưa có dữ liệu', [c.profile.level || '']);
-  if (c.packages.length) { const p = c.packages[0]; card('Gói tập của bạn', p.name || 'Chưa có tên gói', [`Còn ${p.remaining_sessions ?? '—'} buổi`, `Hết hạn: ${p.expires_at || 'Chưa có dữ liệu'}`]); }
+  if (c.packages.length) { const p = c.packages[0]; card('Gói tập của bạn', p.name || 'Chưa có tên gói', [p.remaining_sessions !== null ? `Còn ${p.remaining_sessions} buổi` : 'Chưa có dữ liệu số buổi còn lại', ...(p.total_sessions !== null && p.total_sessions !== undefined ? [`Đã đăng ký: ${p.total_sessions} buổi`] : []), `Hết hạn: ${p.expires_at || 'Chưa có dữ liệu'}`]); }
   else card('Gói tập', 'Chưa có dữ liệu');
-  if (c.schedule.length) { const s = c.schedule[0]; const date = s.starts_at ? new Date(s.starts_at) : null; card('Lịch tập được cấp', s.name || 'Buổi tập', [date && !Number.isNaN(date.getTime()) ? date.toLocaleString('vi-VN') : 'Chưa có thời gian', s.trainer || '']); }
+  if (c.schedule.length) { const s = c.schedule[0]; const date = s.starts_at ? new Date(s.starts_at) : null; card('Lịch tập được cấp', s.name || 'Buổi tập', [date && !Number.isNaN(date.getTime()) ? date.toLocaleString('vi-VN') : s.scheduled_date ? `${s.scheduled_date} · Chưa có giờ tập` : 'Chưa có thời gian', s.trainer || '']); }
   const progress = card('Tiến độ', `${c.progress.sessions_this_week ?? '—'} buổi trong tuần`);
   if (c.progress.completion_percent !== null) { const bar = document.createElement('progress'); bar.max = 100; bar.value = Math.max(0, Math.min(100, c.progress.completion_percent)); bar.setAttribute('aria-label', 'Tỷ lệ hoàn thành'); progress.append(bar); const p = document.createElement('p'); p.textContent = `Hoàn thành ${c.progress.completion_percent}%`; progress.append(p); }
   if (c.summary) card('Phạm vi quản lý', `${c.summary.assigned_members ?? '—'} hội viên`, c.summary.expiring_members !== null ? [`${c.summary.expiring_members} hội viên sắp hết hạn`] : []);

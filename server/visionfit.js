@@ -32,8 +32,8 @@ export function sanitizeContext(raw, user) {
   const records = (value, mapper) => Array.isArray(value) ? value.slice(0, 20).map(mapper) : [];
   return {
     profile: { name: user.name, goal: text(d.profile?.goal), level: text(d.profile?.level) },
-    packages: records(d.packages, p => ({ name: text(p.name), expires_at: text(p.expires_at, 40), remaining_sessions: metric(p.remaining_sessions) })),
-    schedule: records(d.schedule, s => ({ name: text(s.name), starts_at: text(s.starts_at, 40), trainer: text(s.trainer) })),
+    packages: records(d.packages, p => ({ name: text(p.name), expires_at: text(p.expires_at, 40), remaining_sessions: metric(p.remaining_sessions), total_sessions: metric(p.total_sessions) })),
+    schedule: records(d.schedule, s => ({ name: text(s.name), starts_at: text(s.starts_at, 40), scheduled_date: text(s.scheduled_date, 20), trainer: text(s.trainer) })),
     progress: { sessions_this_week: metric(d.progress?.sessions_this_week), completion_percent: metric(d.progress?.completion_percent) },
     summary: user.role === 'member' ? null : { assigned_members: metric(d.summary?.assigned_members), expiring_members: user.role === 'admin' ? metric(d.summary?.expiring_members) : null },
   };
