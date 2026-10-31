@@ -19,7 +19,7 @@ test('installer dry-run is read-only, installs once, preserves original routes a
   const first=install(root);assert.ok(first.installed);assert.ok(first.routes);
   assert.equal(readFileSync(join(root,'routes/api.php.before-assistant.bak'),'utf8'),'<?php\n// existing route\n');
   const second=install(root);assert.equal(second.files.length,0);assert.equal(second.routes,false);
-  assert.equal(readFileSync(join(root,'routes/api.php'),'utf8').split("require_once __DIR__ . '/assistant.php';").length,2);
+  assert.equal(readFileSync(join(root,'routes/api.php'),'utf8').split("require __DIR__ . '/assistant.php';").length,2);
 });
 test('installer fails before any writes if custom files conflict',t=>{
   const root=target(t);

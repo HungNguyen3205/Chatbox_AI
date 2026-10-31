@@ -7,7 +7,7 @@ export const FILES = [
   'app/Http/Middleware/AssistantToken.php',
   'config/assistant.php', 'routes/assistant.php', 'tests/Feature/AssistantApiTest.php',
 ];
-export const HOOK = "\n\n// VisionFit Assistant integration\nrequire_once __DIR__ . '/assistant.php';\n";
+export const HOOK = "\n\n// VisionFit Assistant integration\nrequire __DIR__ . '/assistant.php';\n";
 const root = fileURLToPath(new URL('../', import.meta.url));
 const source = resolve(root, 'integrations/visionfit');
 export function install(target, { dryRun = false } = {}) {
@@ -18,7 +18,7 @@ export function install(target, { dryRun = false } = {}) {
   const routes = resolve(dest, 'routes/api.php');
   const current = readFileSync(routes, 'utf8');
   if (!current.trimStart().startsWith('<?php') || current.includes('?>')) throw new Error('routes/api.php cần kiểm tra thủ công trước khi thêm route.');
-  const installed = current.includes("require_once __DIR__ . '/assistant.php';");
+  const installed = current.includes("require __DIR__ . '/assistant.php';");
   if (!installed && (/prefix\s*\(\s*['"]assistant['"]/.test(current) || /AssistantController/.test(current))) throw new Error('Đã có route assistant khác. Dừng để tránh xung đột; cần hợp nhất thủ công.');
   // Validate every destination before any write. Never overwrite customized PHP files.
   const pending = [];

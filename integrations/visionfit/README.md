@@ -70,4 +70,4 @@ Mẫu live dùng `AI_MODE=demo`: câu trả lời theo từ khóa nhưng lấy d
 
 ## Gỡ tích hợp
 
-Xóa dòng `require_once __DIR__ . '/assistant.php';` khỏi routes/api.php, rồi xóa 5 file PHP trong danh sách installer. Chỉ phục hồi toàn bộ file backup nếu chắc chắn route chưa có chỉnh sửa mới sau lúc cài. Chạy `php artisan optimize:clear`.
+Xóa dòng `require __DIR__ . '/assistant.php';` khỏi routes/api.php, rồi xóa 5 file PHP trong danh sách installer. Chỉ phục hồi toàn bộ file backup nếu chắc chắn route chưa có chỉnh sửa mới sau lúc cài. Chạy `php artisan optimize:clear`.
