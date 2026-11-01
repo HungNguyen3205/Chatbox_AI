@@ -5,7 +5,7 @@ import { randomBytes } from 'node:crypto';
 import { createStore } from './store.js';
 import { AppError, createVisionFit, demoUser, demoContext, ownerKey } from './visionfit.js';
 import { answer } from './assistant.js';
-const PUBLIC = fileURLToPath(new URL('../public/', import.meta.url));
+const PUBLIC = fileURLToPath(new URL('../web/', import.meta.url));
 async function readJSON(req) {
   if (!req.headers['content-type']?.startsWith('application/json')) throw new AppError(415, 'Yêu cầu phải là JSON.');
   let size = 0; const chunks = [];
@@ -99,7 +99,7 @@ export function createApp(c, { logger = console.info } = {}) {
         throw new AppError(404, 'Không tìm thấy API.');
       }
       if (req.method !== 'GET') throw new AppError(405, 'Phương thức không được hỗ trợ.');
-      const files = { '/': ['index.html','text/html'], '/app.js': ['app.js','text/javascript'], '/styles.css': ['styles.css','text/css'], '/favicon.svg': ['favicon.svg','image/svg+xml'] };
+      const files = { '/': ['index.html','text/html'], '/app.js': ['app.js','text/javascript'], '/styles.css': ['styles.css','text/css'], '/favicon.svg': ['favicon.svg','image/svg+xml'], '/services/api.js': ['services/api.js','text/javascript'], '/mascot-lab': ['mascot/lab.html','text/html'], '/mascot/lab.js': ['mascot/lab.js','text/javascript'], '/mascot/mascot.css': ['mascot/mascot.css','text/css'], '/contracts/assistant.js': ['../../packages/contracts/assistant.js','text/javascript'] };
       if (!files[path]) throw new AppError(404, 'Không tìm thấy trang.');
       const [file, type] = files[path];
       res.writeHead(200, { 'Content-Type': `${type}; charset=utf-8` }); res.end(await readFile(PUBLIC + file));

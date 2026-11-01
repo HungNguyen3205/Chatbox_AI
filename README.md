@@ -89,11 +89,11 @@ flowchart TD
 Không kết nối trực tiếp database VisionFit. Token được chuyển tới một backend URL cố định do người vận hành cấu hình. Không có token admin chung.
 
 ```text
-public/
+apps/web/
   index.html          Giao diện đăng nhập và chat
   app.js              Điều phối giao diện và gọi API cùng origin
   styles.css          Responsive, linh vật CSS
-server/
+apps/api/
   index.js            Khởi động ứng dụng
   app.js              HTTP API, phiên, phân quyền, rate limit
   config.js           Cấu hình và kiểm tra môi trường
@@ -102,7 +102,7 @@ server/
   store.js            SQLite lưu lịch sử
  integrations/visionfit/ API Laravel, middleware và test dùng schema thật
  scripts/             Lệnh cài tích hợp vào backend hiện có
- tests/app.test.js     Kiểm thử tích hợp bằng upstream giả lập
+ tests/api/app.test.js     Kiểm thử tích hợp bằng upstream giả lập
  docs/                Hợp đồng API và hướng dẫn triển khai
 ```
 
@@ -126,3 +126,9 @@ server/
 Chưa có: đặt/đổi lịch, ghi dữ liệu vào VisionFit, kho tài liệu RAG, nhận giọng nói, thông báo chủ động, camera AI, thống kê giá tiền hoặc dashboard vận hành. Linh vật CSS có chuyển động nhẹ; chưa phải hệ thống hoạt họa đa trạng thái.
 
 Ưu tiên: kết nối API thật → xác minh quyền → dùng AI thật → tích hợp app → bổ sung kho tài liệu/giọng nói/nhắc tập. Chỉ thêm hành động ghi sau khi có API, quyền và bước xác nhận.
+
+## Làm việc nhóm hai người
+
+Code đã tách: `apps/web` (giao diện/linh vật), `apps/api` (backend/AI), `packages/contracts` (giao ước dùng chung), `tests/api` và `tests/contracts`.
+
+Đọc [phân việc và lệnh Git](docs/TEAM_WORKFLOW.md), [giao ước tích hợp](docs/ASSISTANT_CONTRACT.md) và [CONTRIBUTING](CONTRIBUTING.md). Sau `npm run dev`, mở `/mascot-lab` để thử trạng thái nhân vật bằng hình mẫu. Lab chưa có bộ hình tiến hóa hoặc lưu thú thật. Lệnh chạy cũ tại gốc vẫn giữ nguyên.

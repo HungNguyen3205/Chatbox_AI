@@ -1,18 +1,7 @@
+import { api } from './services/api.js';
 const $ = id => document.getElementById(id);
 const roles = { member: 'Hội viên', trainer: 'Huấn luyện viên', admin: 'Quản lý phòng tập' };
 let state = { user: null, dataMode: 'demo', aiMode: 'demo', busy: false, generation: 0 };
-class APIError extends Error { constructor(message, status) { super(message); this.status = status; } }
-async function api(path, options = {}) {
-  let res;
-  try { res = await fetch(path, { credentials: 'same-origin', ...options, headers: { 'Content-Type': 'application/json', ...options.headers } }); }
-  catch { throw new APIError('Mất kết nối. Vui lòng kiểm tra mạng rồi thử lại.', 0); }
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    if (res.status === 401 && state.user && path !== '/api/auth/login') showLogin('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
-    throw new APIError(body.error || 'Có lỗi xảy ra. Vui lòng thử lại.', res.status);
-  }
-  return body;
-}
 function showLogin(error = '') {
   state.generation++; state.user = null; state.busy = false;
   $('app-view').hidden = true; $('login-view').hidden = false; $('messages').replaceChildren(); $('context-content').replaceChildren();
@@ -88,6 +77,7 @@ async function send(message) {
   } catch(e) { if (generation === state.generation) { $('message').value = question; $('chat-error').textContent = `${e.message} Nội dung được giữ lại để bạn gửi lại.`; } }
   finally { if (generation === state.generation) { state.busy = false; $('typing').hidden = true; updateBusy(); $('message').focus(); } }
 }
+window.addEventListener('vif:session-expired', () => { if (state.user) showLogin('Phiên đã hết hạn. Vui lòng đăng nhập lại.'); });
 $('role').addEventListener('change', fillDemo);
 $('toggle-password').addEventListener('click', () => { const hidden = $('password').type === 'password'; $('password').type = hidden ? 'text' : 'password'; $('toggle-password').textContent = hidden ? 'Ẩn' : 'Hiện'; $('toggle-password').setAttribute('aria-label', hidden ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'); });
 $('login-form').addEventListener('submit', async e => {
